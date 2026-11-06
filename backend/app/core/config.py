@@ -101,6 +101,17 @@ class Settings(BaseSettings):
         "http://127.0.0.1:3000",
         "http://localhost:8000"
     ]
+
+    def get_cors_origins(self) -> List[str]:
+        origins = set(self.CORS_ORIGINS)
+        if self.APP_BASE_URL:
+            clean_url = self.APP_BASE_URL.rstrip("/")
+            origins.add(clean_url)
+            if clean_url.startswith("https://"):
+                origins.add("http://" + clean_url[8:])
+            elif clean_url.startswith("http://"):
+                origins.add("https://" + clean_url[7:])
+        return list(origins)
     
     model_config = SettingsConfigDict(
         env_file=str(BACKEND_DIR / ".env"),
